@@ -55,7 +55,10 @@ impl Connection {
 
         #[cfg(target_arch = "wasm32")]
         {
-            settings.executor(wasm::Executor);
+            settings
+                .executor(wasm::Executor)
+                // reset streams require `Instant::now` which is not available on wasm
+                .http2_max_concurrent_reset_streams(0);
         }
         #[cfg(feature = "transport")]
         {
