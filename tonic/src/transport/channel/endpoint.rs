@@ -327,11 +327,11 @@ impl Endpoint {
         #[cfg(not(feature = "tls"))]
         let connector = service::connector(connector);
 
-        if let Some(connect_timeout) = self.connect_timeout {
+        if let Some(_connect_timeout) = self.connect_timeout {
             #[cfg(feature = "transport")]
             let connector = {
                 let mut connector = hyper_timeout::TimeoutConnector::new(connector);
-                connector.set_connect_timeout(Some(connect_timeout));
+                connector.set_connect_timeout(Some(_connect_timeout));
                 connector
             };
             Channel::connect(connector, self.clone()).await
@@ -347,6 +347,7 @@ impl Endpoint {
     ///
     /// See the `uds` example for an example on how to use this function to build channel that
     /// uses a Unix socket transport.
+    #[cfg(feature = "transport")]
     pub fn connect_with_connector_lazy<C>(&self, connector: C) -> Result<Channel, Error>
     where
         C: MakeConnection<Uri> + Send + 'static,
