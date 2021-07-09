@@ -328,8 +328,12 @@ impl Endpoint {
         let connector = service::connector(connector);
 
         if let Some(connect_timeout) = self.connect_timeout {
-            let mut connector = hyper_timeout::TimeoutConnector::new(connector);
-            connector.set_connect_timeout(Some(connect_timeout));
+            #[cfg(feature = "transport")]
+            let connector = {
+                let mut connector = hyper_timeout::TimeoutConnector::new(connector);
+                connector.set_connect_timeout(Some(connect_timeout));
+                connector
+            };
             Channel::connect(connector, self.clone()).await
         } else {
             Channel::connect(connector, self.clone()).await
